@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import EquityChart from './components/EquityChart'
 
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = 'https://harland-machine-torie.ngrok-free.dev'
 
 const EXAMPLE_PROMPTS = [
   'Buy when RSI drops below 30, sell when RSI crosses back above 70',
