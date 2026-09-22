@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import EquityChart from './components/EquityChart'
 
 const API_BASE = 'https://harland-machine-torie.ngrok-free.dev'
+const HEADERS = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }
 
 const EXAMPLE_PROMPTS = [
   'Buy when RSI drops below 30, sell when RSI crosses back above 70',
@@ -43,7 +44,7 @@ function EntryScreen({ onGenerated, onHistory, historyCount }) {
     try {
       const res  = await fetch(`${API_BASE}/api/generate`, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: HEADERS,
         body:    JSON.stringify({ prompt }),
       })
       const data = await res.json()
@@ -128,7 +129,7 @@ function ParamsScreen({ code, params, onResults, onBack }) {
     try {
       const res  = await fetch(`${API_BASE}/api/run`, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: HEADERS,
         body:    JSON.stringify({ code, params: values, symbol: '^NSEI', period: '1y', interval: '1d' }),
       })
       const data = await res.json()
