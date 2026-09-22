@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import EquityChart from './components/EquityChart'
 
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 const EXAMPLE_PROMPTS = [
   'Buy when RSI drops below 30, sell when RSI crosses back above 70',
   'Buy when the 10-day EMA crosses above the 50-day EMA, sell when the 10-day EMA crosses back below the 50-day EMA',
@@ -39,7 +41,7 @@ function EntryScreen({ onGenerated, onHistory, historyCount }) {
     setLoading(true)
     setError(null)
     try {
-      const res  = await fetch('/api/generate', {
+      const res  = await fetch(`${API_BASE}/api/generate`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ prompt }),
@@ -124,7 +126,7 @@ function ParamsScreen({ code, params, onResults, onBack }) {
     setLoading(true)
     setError(null)
     try {
-      const res  = await fetch('/api/run', {
+      const res  = await fetch(`${API_BASE}/api/run`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ code, params: values, symbol: '^NSEI', period: '1y', interval: '1d' }),
