@@ -508,6 +508,47 @@ body {
   margin-top: -12px;
 }
 
+/* ── Date range picker ── */
+.date-range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.date-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.date-input {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r);
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+.date-input:focus { border-color: var(--accent); }
+.date-sep {
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 18px;
+}
+.date-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 18px;
+}
+
 .sliders {
   display: flex;
   flex-direction: column;

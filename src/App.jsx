@@ -114,27 +114,41 @@ function EntryScreen({ onGenerated, onHistory, historyCount }) {
 }
 
 // ── Screen 2: Parameters ───────────────────────────────────────────────────
+const DATA_MIN_DATE = '2007-09-17'  // earliest Nifty 50 date from yfinance
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10)
+}
+function oneYearAgoStr() {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() - 1)
+  return d.toISOString().slice(0, 10)
+}
+
 function ParamsScreen({ code, params, onResults, onBack }) {
-  const [values, setValues] = useState(() => {
+  const [values,    setValues]    = useState(() => {
     const init = {}
     params.forEach(p => { init[p.name] = p.default })
     return init
   })
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState(null)
+  const [startDate, setStartDate] = useState(oneYearAgoStr)
+  const [endDate,   setEndDate]   = useState(todayStr)
+  const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState(null)
 
   const run = async () => {
+    if (startDate >= endDate) { setError('Start date must be before end date.'); return }
     setLoading(true)
     setError(null)
     try {
       const res  = await fetch(`${API_BASE}/api/run`, {
         method:  'POST',
         headers: HEADERS,
-        body:    JSON.stringify({ code, params: values, symbol: '^NSEI', period: '1y', interval: '1d' }),
+        body:    JSON.stringify({ code, params: values, symbol: '^NSEI', period: '1y', interval: '1d', start_date: startDate, end_date: endDate }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || 'Backtest failed')
-      onResults({ ...data, paramValues: values, code })
+      onResults({ ...data, paramValues: values, code, startDate, endDate })
     } catch (e) {
       setError(e.message)
     } finally {
@@ -152,8 +166,36 @@ function ParamsScreen({ code, params, onResults, onBack }) {
         <div className="params-title">Tune your strategy</div>
         <div className="params-sub">
           {params.length > 0
-            ? 'Adjust the parameters below or run with defaults.'
-            : 'No tunable parameters detected. Ready to run.'}
+            ? 'Adjust parameters and date range, then run.'
+            : 'Set the date range and run.'}
+        </div>
+
+        {/* Date range picker */}
+        <div className="date-range-row">
+          <div className="date-field">
+            <label className="date-label">From</label>
+            <input
+              type="date"
+              className="date-input"
+              value={startDate}
+              min={DATA_MIN_DATE}
+              max={endDate}
+              onChange={e => setStartDate(e.target.value)}
+            />
+          </div>
+          <div className="date-sep">→</div>
+          <div className="date-field">
+            <label className="date-label">To</label>
+            <input
+              type="date"
+              className="date-input"
+              value={endDate}
+              min={startDate}
+              max={todayStr()}
+              onChange={e => setEndDate(e.target.value)}
+            />
+          </div>
+          <span className="date-hint">Data available from Sep 2007</span>
         </div>
 
         {params.length > 0 && (
@@ -231,7 +273,7 @@ function ResultsScreen({ data, onBack, onTweak }) {
         <button className="back-btn" onClick={onBack}>← New Strategy</button>
         <div className="results-meta">
           <span className="meta-badge">{data.symbol}</span>
-          <span className="meta-badge">1y · 1d</span>
+          <span className="meta-badge">{data.startDate} → {data.endDate}</span>
           <span className="meta-badge">{s.total_trades} trades</span>
           <span className="meta-badge dim">#{data.fingerprint}</span>
         </div>
